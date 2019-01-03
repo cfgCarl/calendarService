@@ -24,7 +24,9 @@ import com.google.api.services.calendar.model.*;
 import java.io.IOException;
         import java.io.InputStream;
         import java.io.InputStreamReader;
-        import java.security.GeneralSecurityException;
+import java.lang.reflect.Array;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,9 +81,9 @@ public class CalendarQuickstart {
                 .build();
         deleteEvents(service, ZIELCalenderID);
         //terminAbrfage(service);
-        //eventsSchreiben(service, eventsBearbeiten(eventsLesen(service, cal1ID), cal1Name), ZIELCalenderID);
-        //eventsSchreiben(service, eventsBearbeiten(eventsLesen(service, cal2ID), cal2Name), ZIELCalenderID);
-        //eventsSchreiben(service, eventsBearbeiten(eventsLesen(service, cal3ID), cal3Name), ZIELCalenderID);
+        eventsSchreiben(service, eventsBearbeiten(eventsLesen(service, cal1ID), cal1Name), ZIELCalenderID);
+        eventsSchreiben(service, eventsBearbeiten(eventsLesen(service, cal2ID), cal2Name), ZIELCalenderID);
+        eventsSchreiben(service, eventsBearbeiten(eventsLesen(service, cal3ID), cal3Name), ZIELCalenderID);
 
     }
     public static List<Event> terminAbrfage(Calendar service) throws IOException{
@@ -202,8 +204,32 @@ public class CalendarQuickstart {
         }
         return events;
     }
+    public static List<Event> eventsAussortieren (List<Event> events, List<String> schlagwoerter) throws IOException {
+        List<Event> aussortieren = new LinkedList<Event>();
+        for(String krit:schlagwoerter) {
+            for(Event e:events) {
+                if(e.getSummary().contains(krit)) {
+                    aussortieren.add(e);
+                }
+            }
+        }
+        for(Event x:aussortieren){
+            events.remove(x);
+        }
+        return events;
+    }
     public static void eventsSchreiben(Calendar service, List<Event> events, String calID) throws IOException{
         Events existEvents = service.events().list(calID).execute();
+        ArrayList<String> aussort = new ArrayList<String>();
+        aussort.add("Jungschar Jungs");
+        aussort.add("Jungschar Mäd");
+        aussort.add("Jugendkreis STB");
+        aussort.add("Jugendkreis Touchdown");
+        aussort.add("Jugendkreis Jumble");
+        aussort.add("Jungenschaft Jesushunters");
+        aussort.add("Mini-Treff");
+        aussort.add("Mittwochsfußball");
+        events = eventsAussortieren(events, aussort);
         for(Event ev:events) {
                 ev.setRecurringEventId("");
                 ev.setId("").setICalUID("");
